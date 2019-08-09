@@ -30,14 +30,14 @@ provider:
       value: ${self:custom.apikeys.slack_ingest}
     - name: ${self:custom.project}-github_ingest-apikey
       value: ${self:custom.apikeys.github_ingest}
-    - name: ${self:custom.project}-jira_ingest-apikey
-      value: ${self:custom.apikeys.jira_ingest}
     - name: ${self:custom.project}-slack_event_app_ingest-apikey
       value: ${self:custom.apikeys.slack_app_ingest}
     - name: ${self:custom.project}-polling_ingest_apikey
       value: ${self:custom.apikeys.polling_ingest}
     - name: ${self:custom.project}-travis_ingest_apikey
       value: ${self:custom.apikeys.travis_ingest}
+    - name: ${self:custom.project}-jira_ingest-apikey
+      value: ${self:custom.apikeys.jira_ingest}
   usagePlan:
     throttle: #TODO decide on some values
       burstLimit: 200
@@ -198,6 +198,11 @@ resources:
             - ".execute-api.${self:provider.region}.amazonaws.com/${self:custom.stage}/dataplattform_ingest/"
       Export:
         Name: ${self:custom.project}-ingest-url
+    TravisIngestKey:
+      Description: "Ingest key for automated integration tests"
+      Value: ${self:custom.apikeys.travis_ingest}
+      Export:
+        Name: ${self:custom.project}-travis-ingest-apikey
 
 plugins:
   - serverless-stack-output

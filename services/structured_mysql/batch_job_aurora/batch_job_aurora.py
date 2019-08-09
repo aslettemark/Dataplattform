@@ -6,7 +6,7 @@ import pymysql
 from datetime import datetime as dt
 
 """
-This lambda gets raw data from the get_docs API and extracts only the valueable information and 
+This lambda gets raw data from the get_docs API and extracts only the valuable information and
 inserts that information into an aurora db. 
 """
 
@@ -16,7 +16,6 @@ DEFAULT_TYPES = [
     "EventRatingType",
     "EventType",
     "GithubType",
-    "JiraType",
     "SlackType",
     "SlackReactionType",
     "UBWType",

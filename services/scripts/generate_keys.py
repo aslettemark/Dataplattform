@@ -8,6 +8,7 @@ keys = [
     "dataplattform_STAGE_slack_event_app_ingest_apikey",
     "dataplattform_STAGE_polling_ingest_apikey",
     "dataplattform_STAGE_travis_ingest_apikey",
+    "dataplattform_STAGE_jira_ingest_apikey"
 
     "dataplattform_STAGE_fetch_apikey",
     "dataplattform_STAGE_batch_job_apikey",
