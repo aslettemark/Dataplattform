@@ -16,6 +16,7 @@ DEFAULT_TYPES = [
     "EventRatingType",
     "EventType",
     "GithubType",
+    "JiraType",
     "SlackType",
     "SlackReactionType",
     "UBWType",

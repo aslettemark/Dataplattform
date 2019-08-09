@@ -6,9 +6,11 @@ custom:
   ingest_lambda: ${self:custom.project}-ingest
   slack_ingest_lambda: ${self:custom.project}-slack_ingest
   github_ingest_lambda: ${self:custom.project}-github_ingest
+  jira_ingest_lambda: ${self:custom.project}-jira_ingest
   apikeys:
     slack_ingest: ${ssm:dataplattform_${self:custom.stage}_slack_ingest_apikey}
     github_ingest: ${ssm:dataplattform_${self:custom.stage}_github_ingest_apikey}
+    jira_ingest: ${ssm:dataplattform_${self:custom.stage}_jira_ingest_apikey}
     slack_app_ingest: ${ssm:dataplattform_${self:custom.stage}_slack_event_app_ingest_apikey}
     polling_ingest: ${ssm:dataplattform_${self:custom.stage}_polling_ingest_apikey}
     travis_ingest: ${ssm:dataplattform_${self:custom.stage}_travis_ingest_apikey}
@@ -28,6 +30,8 @@ provider:
       value: ${self:custom.apikeys.slack_ingest}
     - name: ${self:custom.project}-github_ingest-apikey
       value: ${self:custom.apikeys.github_ingest}
+    - name: ${self:custom.project}-jira_ingest-apikey
+      value: ${self:custom.apikeys.jira_ingest}
     - name: ${self:custom.project}-slack_event_app_ingest-apikey
       value: ${self:custom.apikeys.slack_app_ingest}
     - name: ${self:custom.project}-polling_ingest_apikey
@@ -117,6 +121,31 @@ functions:
           path: github_ingest
           method: post
           private: false
+  jira_ingest:
+    handler: jira_ingest/jira_ingest.handler
+    name: ${self:custom.jira_ingest_lambda}
+    description: JIRA webhook endpoint
+    role: ingestMiddleManRole
+    package:
+      include:
+        - 'jira_ingest/*.py'
+    environment:
+      DATAPLATTFORM_INGEST_APIKEY: ${self:custom.apikeys.jira_ingest}
+      DATAPLATTFORM_JIRA_URL:
+        !Join
+        - ''
+        - - 'https://'
+          - !Ref ApiGatewayRestApi
+          - '.execute-api.'
+          - ${self:provider.region}
+          - '.amazonaws.com/'
+          - ${self:custom.stage}
+          - '/dataplattform_ingest/JiraType'
+    events:
+      - http:
+          path: ${ssm:dataplattform_dev_jira_url}_jira_ingest
+          method: post
+          private: false
 
 resources:
   Resources:
@@ -169,11 +198,6 @@ resources:
             - ".execute-api.${self:provider.region}.amazonaws.com/${self:custom.stage}/dataplattform_ingest/"
       Export:
         Name: ${self:custom.project}-ingest-url
-    TravisIngestKey:
-      Description: "Ingest key for automated integration tests"
-      Value: ${self:custom.apikeys.travis_ingest}
-      Export:
-        Name: ${self:custom.project}-travis-ingest-apikey
 
 plugins:
   - serverless-stack-output
