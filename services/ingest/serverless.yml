@@ -6,12 +6,14 @@ custom:
   ingest_lambda: ${self:custom.project}-ingest
   slack_ingest_lambda: ${self:custom.project}-slack_ingest
   github_ingest_lambda: ${self:custom.project}-github_ingest
+  hello_lambda: ${self:custom.project}-github_ingest
   apikeys:
     slack_ingest: ${ssm:dataplattform_${self:custom.stage}_slack_ingest_apikey}
     github_ingest: ${ssm:dataplattform_${self:custom.stage}_github_ingest_apikey}
     slack_app_ingest: ${ssm:dataplattform_${self:custom.stage}_slack_event_app_ingest_apikey}
     polling_ingest: ${ssm:dataplattform_${self:custom.stage}_polling_ingest_apikey}
     travis_ingest: ${ssm:dataplattform_${self:custom.stage}_travis_ingest_apikey}
+    hello: ${ssm:dataplattform_${self:custom.stage}_hello_apikey}
   output:
     file: ../integration_tests/ingest.serverless_outputs_${self:custom.stage}.json
 
@@ -34,6 +36,8 @@ provider:
       value: ${self:custom.apikeys.polling_ingest}
     - name: ${self:custom.project}-travis_ingest_apikey
       value: ${self:custom.apikeys.travis_ingest}
+    - name: ${self:custom.project}-hello_apikey
+      value: ${self:custom.apikeys.hello}
   usagePlan:
     throttle: #TODO decide on some values
       burstLimit: 200
@@ -50,6 +54,16 @@ package:
     - "./**"
 
 functions:
+  hello:
+    handler: hello/helloworld.handler
+    package:
+      include:
+        - 'hello/*.py'
+    events:
+      - http:
+          path: hello/{name}
+          method: post
+          private: true
   ingest:
     handler: ingest/ingest.handler
     name: ${self:custom.ingest_lambda}
